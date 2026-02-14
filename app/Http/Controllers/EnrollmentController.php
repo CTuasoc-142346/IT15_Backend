@@ -8,22 +8,38 @@ use App\Models\Course;
 
 class EnrollmentController extends Controller
 {
-    public function enroll(Request $request)
+    public function create()
     {
+        $students = Student::all();
+        $courses = Course::all();
+
+        return view('enrollments.create', [
+            'students' => $students,
+            'courses' => $courses
+        ]);
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'student_id' => 'required|exists:students,id',
+            'course_id' => 'required|exists:courses,id'
+        ]);
+
         $student = Student::findOrFail($request->student_id);
         $course = Course::findOrFail($request->course_id);
 
-        // Prevent duplicate enrollment
+        // prevent duplicate enrollment
         if ($student->courses()->where('course_id', $course->id)->exists()) {
             return back()->with('error', 'Student already enrolled in this course.');
         }
 
-        // Check capacity
+        // check course capacity
         if ($course->students()->count() >= $course->capacity) {
-            return back()->with('error', 'Course is full.');
+            return back()->with('error', 'Course is already full.');
         }
 
-        // Enroll
+        // enroll student
         $student->courses()->attach($course->id);
 
         return back()->with('success', 'Enrollment successful.');
