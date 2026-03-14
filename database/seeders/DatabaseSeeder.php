@@ -6,14 +6,19 @@ use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
 {
-    public function run()
+    public function run(): void
     {
         $this->call([
-            StudentSeeder::class,
-            CourseSeeder::class,
-            CategorySeeder::class,
-            PostSeeder::class,
-            UserSeeder::class
+            UserSeeder::class,         // users (admin accounts)
+            CategorySeeder::class,     // post categories
+            DepartmentSeeder::class,   // departments  ← NEW (must run before programs & courses)
+            ProgramSeeder::class,      // programs     ← NEW (depends on departments)
+            SubjectSeeder::class,      // subjects     ← NEW (depends on programs)
+            CourseSeeder::class,       // courses      ← REBUILT (depends on departments)
+            StudentSeeder::class,      // students
+            EnrollmentSeeder::class,   // enrollments  (depends on students + courses)
+            SchoolDaySeeder::class,    // academic calendar
+            PostSeeder::class,         // posts        (depends on categories)
         ]);
     }
 }
